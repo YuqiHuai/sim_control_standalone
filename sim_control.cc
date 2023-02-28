@@ -16,7 +16,7 @@
 
 // /apollo/tree/v8.0.0/modules/dreamview/backend/sim_control
 
-#include "modules/dreamview/backend/sim_control/sim_control.h"
+#include "modules/sim_control_standalone/sim_control.h"
 
 #include "cyber/common/file.h"
 #include "cyber/time/clock.h"

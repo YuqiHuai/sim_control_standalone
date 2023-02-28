@@ -34,7 +34,7 @@
 #include "cyber/cyber.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/map/map_service.h"
-#include "modules/dreamview/backend/sim_control/sim_control_interface.h"
+#include "modules/sim_control_standalone/sim_control_interface.h"
 
 /**
  * @namespace apollo::dreamview
@@ -71,6 +71,12 @@ class SimControl : SimControlInterface {
    * messages.
    */
   void Start() override;
+
+  /**
+   * @brief Starts the timer to publish simulated localization and chassis
+   * messages. Designated Start point for scenario
+   */
+  void Start(double x, double y);
 
   /**
    * @brief Stops the timer.
@@ -115,12 +121,6 @@ class SimControl : SimControlInterface {
   void PublishDummyPrediction();
 
   void InitTimerAndIO();
-
-  /**
-   * @brief Starts the timer to publish simulated localization and chassis
-   * messages. Designated Start point for scenario
-   */
-  void Start(double x, double y);
 
   void InitStartPoint(double start_velocity, double start_acceleration);
 

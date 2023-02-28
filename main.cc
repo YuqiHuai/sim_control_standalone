@@ -17,7 +17,7 @@
 int float_test(const char *s) {
     char *endptr;
     errno = 0;
-    float f = strtof(s, &endptr);
+    strtof(s, &endptr);
     if (s == endptr) {
         return 0;
     }
