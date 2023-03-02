@@ -265,7 +265,7 @@ void SimControl::Start() {
 void SimControl::Start(double x, double y, double heading) {
   std::lock_guard<std::mutex> lock(mutex_);
   
-  if (!enabled) {
+  if (!enabled_) {
     TrajectoryPoint point;
 
     point.mutable_path_point()->set_x(x);
