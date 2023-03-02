@@ -78,6 +78,8 @@ class SimControl : SimControlInterface {
    */
   void Start(double x, double y);
 
+  void Start(double x, double y, double heading);
+
   /**
    * @brief Stops the timer.
    */

@@ -45,10 +45,11 @@ int main(int argc, char *argv[]) {
     map_service_.reset(new apollo::dreamview::MapService());
     sim_control_.reset(new apollo::dreamview::SimControl(map_service_.get()));
 
-    if (argc == 3 && float_test(argv[1]) && float_test(argv[2])) {
+    if (argc == 4 && float_test(argv[1]) && float_test(argv[2]) && float_test(argv[3])) {
         double x = atof(argv[1]);
         double y = atof(argv[2]);
-        sim_control_->Start(x, y);
+        double heading = atof(argv[3]);
+        sim_control_->Start(x, y, heading);
     } else {
         sim_control_->Start();
     }
