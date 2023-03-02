@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-// /apollo/tree/v8.0.0/modules/dreamview/backend/sim_control
-
 #pragma once
 
 /**

@@ -18,16 +18,16 @@ cc_library(
         "//modules/common/util:util_tool",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/map:map_service",
-        "//modules/common_msgs/planning_msgs:navigation_cc_proto",
-        "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/common_msgs/prediction_msgs:prediction_obstacle_cc_proto",
-        "//modules/common_msgs/prediction_msgs:scenario_cc_proto",
+        "//modules/map/relative_map/proto:navigation_cc_proto",
+        "//modules/planning/proto:planning_cc_proto",
+        "//modules/prediction/proto:prediction_obstacle_cc_proto",
+        "//modules/prediction/proto:scenario_cc_proto",
         "@com_google_googletest//:gtest",
     ],
 )
 
 cc_binary(
-    name = "sim_control_standalone",
+    name = "main",
     srcs = ["main.cc"],
     deps = [
         "//modules/dreamview/backend/map:map_service",

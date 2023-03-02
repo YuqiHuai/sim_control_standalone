@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-// /apollo/tree/v8.0.0/modules/dreamview/backend/sim_control
-
 #include "modules/sim_control_standalone/sim_control.h"
 
 #include "cyber/common/file.h"
@@ -44,7 +42,6 @@ using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 using apollo::prediction::PredictionObstacles;
 using apollo::relative_map::NavigationInfo;
-using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
 
 namespace {
@@ -85,11 +82,6 @@ void SimControl::InitTimerAndIO() {
       [this](const std::shared_ptr<RoutingResponse>& routing) {
         this->OnRoutingResponse(routing);
       });
-  routing_request_reader_ = node_->CreateReader<RoutingRequest>(
-      FLAGS_routing_request_topic,
-      [this](const std::shared_ptr<RoutingRequest>& routing_request) {
-        this->OnRoutingRequest(routing_request);
-      });
   navigation_reader_ = node_->CreateReader<NavigationInfo>(
       FLAGS_navigation_topic,
       [this](const std::shared_ptr<NavigationInfo>& navigation_info) {
@@ -115,28 +107,11 @@ void SimControl::InitTimerAndIO() {
       false));
 }
 
-void SimControl::Init(double start_velocity, double start_acceleration) {
+void SimControl::Init(double start_velocity,
+                      double start_acceleration) {
   if (!FLAGS_use_navigation_mode) {
     InitStartPoint(start_velocity, start_acceleration);
   }
-}
-
-void SimControl::InitStartPoint(double x, double y, double start_velocity,
-                                double start_acceleration) {
-  TrajectoryPoint point;
-  // Use the scenario start point as start point,
-  start_point_from_localization_ = false;
-  point.mutable_path_point()->set_x(x);
-  point.mutable_path_point()->set_y(y);
-  // z use default 0
-  point.mutable_path_point()->set_z(0);
-  double theta = 0.0;
-  double s = 0.0;
-  map_service_->GetPoseWithRegardToLane(x, y, &theta, &s);
-  point.mutable_path_point()->set_theta(theta);
-  point.set_v(start_velocity);
-  point.set_a(start_acceleration);
-  SetStartPoint(point);
 }
 
 void SimControl::InitStartPoint(double start_velocity,
@@ -199,12 +174,6 @@ void SimControl::Reset() {
   InternalReset();
 }
 
-void SimControl::Restart(double x, double y) {
-  Stop();
-  Start(x, y);
-  return;
-}
-
 void SimControl::InternalReset() {
   current_routing_header_.Clear();
   re_routing_triggered_ = false;
@@ -238,49 +207,29 @@ void SimControl::OnRoutingResponse(
 
   CHECK_GE(routing->routing_request().waypoint_size(), 2)
       << "routing should have at least two waypoints";
+  const auto& start_pose = routing->routing_request().waypoint(0).pose();
 
   current_routing_header_ = routing->header();
-}
 
-void SimControl::OnRoutingRequest(
-    const std::shared_ptr<RoutingRequest>& routing_request) {
-  std::lock_guard<std::mutex> lock(mutex_);
-  if (!enabled_) {
-    return;
-  }
-
-  CHECK_GE(routing_request->waypoint_size(), 2)
-      << "routing should have at least two waypoints";
-  const auto& start_pose = routing_request->waypoint(0).pose();
-
-  ClearPlanning();
-  TrajectoryPoint point;
-  point.mutable_path_point()->set_x(start_pose.x());
-  point.mutable_path_point()->set_y(start_pose.y());
-  point.set_a(next_point_.has_a() ? next_point_.a() : 0.0);
-  point.set_v(next_point_.has_v() ? next_point_.v() : 0.0);
-  double theta = 0.0;
-  double s = 0.0;
-  const auto& start_way_point = routing_request->waypoint().Get(0);
-  // If the lane id has been set, set theta as the lane heading.
-  if (start_way_point.has_id()) {
-    auto& hdmap = hdmap::HDMapUtil::BaseMap();
-    hdmap::Id lane_id = hdmap::MakeMapId(start_way_point.id());
-    auto lane = hdmap.GetLaneById(lane_id);
-    if (nullptr != lane) {
-      theta = lane->Heading(start_way_point.s());
-    } else {
-      map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
-                                            &theta, &s);
-    }
-  } else {
-    // Find the lane nearest to the start pose and get its heading as theta.
+  // If this is from a planning re-routing request, or the start point has
+  // been
+  // initialized by an actual localization pose, don't reset the start point.
+  re_routing_triggered_ =
+      routing->routing_request().header().module_name() == "planning";
+  if (!re_routing_triggered_ && !start_point_from_localization_) {
+    ClearPlanning();
+    TrajectoryPoint point;
+    point.mutable_path_point()->set_x(start_pose.x());
+    point.mutable_path_point()->set_y(start_pose.y());
+    point.set_a(next_point_.has_a() ? next_point_.a() : 0.0);
+    point.set_v(next_point_.has_v() ? next_point_.v() : 0.0);
+    double theta = 0.0;
+    double s = 0.0;
     map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
                                           &theta, &s);
+    point.mutable_path_point()->set_theta(theta);
+    SetStartPoint(point);
   }
-
-  point.mutable_path_point()->set_theta(theta);
-  SetStartPoint(point);
 }
 
 void SimControl::OnPredictionObstacles(
@@ -313,13 +262,20 @@ void SimControl::Start() {
   }
 }
 
-void SimControl::Start(double x, double y) {
+void SimControl::Start(double x, double y, double heading) {
   std::lock_guard<std::mutex> lock(mutex_);
+  
+  if (!enabled) {
+    TrajectoryPoint point;
 
-  if (!enabled_) {
-    // Do not use localization info. use scenario start point to init start
-    // point.
-    InitStartPoint(x, y, 0, 0);
+    point.mutable_path_point()->set_x(x);
+    point.mutable_path_point()->set_y(y);
+    point.mutable_path_point()->set_z(0.0);
+    point.set_a(0.0);
+    point.set_v(0.0);
+    point.mutable_path_point()->set_theta(heading);
+    SetStartPoint(point);
+
     InternalReset();
     sim_control_timer_->Start();
     sim_prediction_timer_->Start();
@@ -333,8 +289,6 @@ void SimControl::Stop() {
   if (enabled_) {
     sim_control_timer_->Stop();
     sim_prediction_timer_->Stop();
-    // kill sim obstacle
-    std::system(FLAGS_sim_obstacle_stop_command.data());
     enabled_ = false;
   }
 }
