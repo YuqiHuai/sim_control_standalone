@@ -67,7 +67,7 @@ bool IsSameHeader(const Header& lhs, const Header& rhs) {
 
 SimControl::SimControl(const MapService* map_service)
     : map_service_(map_service),
-      node_(cyber::CreateNode("sim_control")),
+      node_(cyber::CreateNode("sim_control_standalone")),
       current_trajectory_(std::make_shared<ADCTrajectory>()) {
   InitTimerAndIO();
 }
