@@ -27,7 +27,7 @@ cc_library(
 )
 
 cc_binary(
-    name = "sim_control_standalone",
+    name = "main",
     srcs = ["main.cc"],
     deps = [
         "//modules/dreamview/backend/map:map_service",
