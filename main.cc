@@ -6,6 +6,7 @@
 #include "modules/sim_control_standalone/sim_control.h"
 #include <unistd.h>
 #include <stdlib.h>
+#include "modules/dreamview/backend/common/dreamview_gflags.h"
 
 // bazel build //modules/sim_control_standalone:sim_control_standalone
 // bazel run //modules/sim_control_standalone:sim_control_standalone

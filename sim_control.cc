@@ -85,11 +85,11 @@ void SimControl::InitTimerAndIO() {
       [this](const std::shared_ptr<RoutingResponse>& routing) {
         this->OnRoutingResponse(routing);
       });
-  routing_request_reader_ = node_->CreateReader<RoutingRequest>(
-      FLAGS_routing_request_topic,
-      [this](const std::shared_ptr<RoutingRequest>& routing_request) {
-        this->OnRoutingRequest(routing_request);
-      });
+  // routing_request_reader_ = node_->CreateReader<RoutingRequest>(
+  //     FLAGS_routing_request_topic,
+  //     [this](const std::shared_ptr<RoutingRequest>& routing_request) {
+  //       this->OnRoutingRequest(routing_request);
+  //     });
   navigation_reader_ = node_->CreateReader<NavigationInfo>(
       FLAGS_navigation_topic,
       [this](const std::shared_ptr<NavigationInfo>& navigation_info) {
