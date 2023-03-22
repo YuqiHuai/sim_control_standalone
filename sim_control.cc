@@ -276,7 +276,7 @@ void SimControl::Start(double x, double y) {
 
     double theta = 0.0;
     double s = 0.0;
-    map_service_->GetPoseWithRegardToLane(point.x(), point.y(),
+    map_service_->GetPoseWithRegardToLane(x, y,
                                           &theta, &s);
     point.mutable_path_point()->set_theta(theta);
     SetStartPoint(point);
