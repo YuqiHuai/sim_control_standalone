@@ -262,6 +262,32 @@ void SimControl::Start() {
   }
 }
 
+void SimControl::Start(double x, double y) {
+  std::lock_guard<std::mutex> lock(mutex_);
+
+  if (!enabled_) {
+    TrajectoryPoint point;
+
+    point.mutable_path_point()->set_x(x);
+    point.mutable_path_point()->set_y(y);
+    point.mutable_path_point()->set_z(0.0);
+    point.set_a(0.0);
+    point.set_v(0.0);
+
+    double theta = 0.0;
+    double s = 0.0;
+    map_service_->GetPoseWithRegardToLane(point.x(), point.y(),
+                                          &theta, &s);
+    point.mutable_path_point()->set_theta(theta);
+    SetStartPoint(point);
+
+    InternalReset();
+    sim_control_timer_->Start();
+    sim_prediction_timer_->Start();
+    enabled_ = true;
+  }
+}
+
 void SimControl::Start(double x, double y, double heading) {
   std::lock_guard<std::mutex> lock(mutex_);
   

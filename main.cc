@@ -51,6 +51,10 @@ int main(int argc, char *argv[]) {
         double y = atof(argv[2]);
         double heading = atof(argv[3]);
         sim_control_->Start(x, y, heading);
+    } else if (argc == 3 && float_test(argv[1]) && float_test(argv[2])) {
+        double x = atof(argv[1]);
+        double y = atof(argv[2]);
+        sim_control_->Start(x, y);
     } else {
         sim_control_->Start();
     }

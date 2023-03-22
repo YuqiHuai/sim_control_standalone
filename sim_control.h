@@ -70,7 +70,7 @@ class SimControl : SimControlInterface {
    * messages.
    */
   void Start() override;
-
+  void Start(double x, double y);
   void Start(double x, double y, double heading);
 
   /**
