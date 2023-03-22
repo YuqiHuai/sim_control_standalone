@@ -39,6 +39,7 @@ int float_test(const char *s) {
 int main(int argc, char *argv[]) {
     apollo::cyber::Init(argv[0]);
 
+    google::ReadFromFlagsFile("/apollo/modules/common/data/global_flagfile.txt", argv[0], true);
     std::unique_ptr<apollo::dreamview::MapService> map_service_;
     std::unique_ptr<apollo::dreamview::SimControl> sim_control_;
 

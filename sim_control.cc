@@ -387,7 +387,7 @@ bool SimControl::PerfectControlModel(TrajectoryPoint* point,
 void SimControl::PublishChassis(double cur_speed,
                                 Chassis::GearPosition gear_position) {
   auto chassis = std::make_shared<Chassis>();
-  FillHeader("SimControl", chassis.get());
+  FillHeader("SimControlStandalone", chassis.get());
 
   chassis->set_engine_started(true);
   chassis->set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
@@ -406,7 +406,7 @@ void SimControl::PublishChassis(double cur_speed,
 
 void SimControl::PublishLocalization(const TrajectoryPoint& point) {
   auto localization = std::make_shared<LocalizationEstimate>();
-  FillHeader("SimControl", localization.get());
+  FillHeader("SimControlStandalone", localization.get());
 
   auto* pose = localization->mutable_pose();
   auto prev = prev_point_.path_point();
