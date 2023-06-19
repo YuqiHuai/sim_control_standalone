@@ -171,7 +171,7 @@ class SimControl : SimControlInterface {
   std::unique_ptr<cyber::Timer> sim_prediction_timer_;
 
   // Time interval of the timer, in milliseconds.
-  static constexpr double kSimControlIntervalMs = 10;
+  static constexpr double kSimControlIntervalMs = 100;
   static constexpr double kSimPredictionIntervalMs = 100;
 
   // The latest received planning trajectory.
@@ -203,6 +203,7 @@ class SimControl : SimControlInterface {
   apollo::common::TrajectoryPoint next_point_;
 
   common::PathPoint adc_position_;
+  double adc_position_timestamp_;
 
   // Linearize reader/timer callbacks and external operations.
   std::mutex mutex_;
