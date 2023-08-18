@@ -1,4 +1,3 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -15,14 +14,16 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util:util_tool",
+        "//modules/common:common",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/map:map_service",
-        "//modules/common_msgs/planning_msgs:navigation_cc_proto",
-        "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/common_msgs/prediction_msgs:prediction_obstacle_cc_proto",
-        "//modules/common_msgs/prediction_msgs:scenario_cc_proto",
-        "@com_google_googletest//:gtest",
+        # "//modules/common_msgs/planning_msgs:navigation_cc_proto",
+        # "//modules/common_msgs/planning_msgs:planning_cc_proto",
+	"//modules/planning/proto:planning_proto",
+        # "//modules/common_msgs/prediction_msgs:prediction_obstacle_cc_proto",
+        # "//modules/common_msgs/prediction_msgs:scenario_cc_proto",
+	"//modules/prediction/proto:prediction_proto",
+        #"@com_google_googletest//:gtest",
     ],
 )
 

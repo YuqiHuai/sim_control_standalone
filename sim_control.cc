@@ -19,7 +19,8 @@
 #include "modules/sim_control_standalone/sim_control.h"
 
 #include "cyber/common/file.h"
-#include "cyber/time/clock.h"
+//#include "cyber/time/clock.h"
+#include "cyber/time/time.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/math_utils.h"
@@ -39,7 +40,8 @@ using apollo::common::math::HeadingToQuaternion;
 using apollo::common::math::InterpolateUsingLinearApproximation;
 using apollo::common::math::InverseQuaternionRotate;
 using apollo::common::util::FillHeader;
-using apollo::cyber::Clock;
+using apollo::cyber::Time;
+//using apollo::cyber::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 using apollo::prediction::PredictionObstacles;
@@ -353,7 +355,7 @@ void SimControl::Stop() {
     sim_control_timer_->Stop();
     sim_prediction_timer_->Stop();
     // kill sim obstacle
-    std::system(FLAGS_sim_obstacle_stop_command.data());
+    //std::system(FLAGS_sim_obstacle_stop_command.data());
     enabled_ = false;
   }
 }
@@ -401,7 +403,8 @@ void SimControl::RunOnce() {
 bool SimControl::PerfectControlModel(TrajectoryPoint* point,
                                      Chassis::GearPosition* gear_position) {
   // Result of the interpolation.
-  auto current_time = Clock::NowInSeconds();
+  //auto current_time = Clock::NowInSeconds();
+  auto current_time = Time::Now().ToSecond();
   const auto& trajectory = current_trajectory_->trajectory_point();
   *gear_position = current_trajectory_->gear();
 
