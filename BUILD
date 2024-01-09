@@ -1,23 +1,22 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
 
-package(default_visibility = ["//visibility:public"])
+package(default_visibility=["//visibility:public"])
 
 cc_library(
-    name = "sim_control",
-    srcs = ["sim_control.cc"],
-    hdrs = [
+    name="sim_control",
+    srcs=["sim_control.cc"],
+    hdrs=[
         "sim_control.h",
         "sim_control_interface.h",
     ],
-    alwayslink = True,
+    alwayslink=True,
     # copts = ['-DMODULE_NAME=\\"dreamview\\"'],
-    deps = [
+    deps=[
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:util_tool",
-        "//modules/dreamview/backend/common:dreamview_gflags",
-        "//modules/dreamview/backend/map:map_service",
+        "//modules/dreamview/backend/common:dreamview_common",
         "//modules/common_msgs/planning_msgs:navigation_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/common_msgs/prediction_msgs:prediction_obstacle_cc_proto",
@@ -27,11 +26,11 @@ cc_library(
 )
 
 cc_binary(
-    name = "main",
-    srcs = ["main.cc"],
-    deps = [
-        "//modules/dreamview/backend/map:map_service",
-        "//modules/sim_control_standalone:sim_control"
+    name="main",
+    srcs=["main.cc"],
+    deps=[
+        "//modules/dreamview/backend/common:dreamview_common",
+        "//modules/sim_control_standalone:sim_control",
     ],
 )
 
